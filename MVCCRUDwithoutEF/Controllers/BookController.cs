@@ -25,10 +25,11 @@ namespace MVCCRUDwithoutEF.Controllers
             return View();
         }
 
-        // GET: Book/Edit/5
+        // GET: Book/AddOrEdit/
         public IActionResult AddOrEdit(int? id)
         {
-            return View();
+            BookViewModel bookViewModel = new BookViewModel();
+            return View(bookViewModel);
         }
 
         // POST: Book/Edit/5
