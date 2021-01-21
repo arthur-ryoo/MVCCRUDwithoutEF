@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using MVCCRUDwithoutEF.Data;
 using MVCCRUDwithoutEF.Models;
 
@@ -16,25 +13,16 @@ namespace MVCCRUDwithoutEF.Controllers
     public class BookController : Controller
     {
         private readonly MVCCRUDwithoutEFContext _context;
-        private readonly IConfiguration _configuration;
 
-        public BookController(IConfiguration configuration)
+        public BookController()
         {
-            this._configuration = configuration;
+
         }
 
         // GET: Book
         public IActionResult Index()
         {
-            DataTable dtbl = new DataTable();
-            using (SqlConnection sqlConnection = new SqlConnection(_configuration.GetConnectionString("DevConnection")))
-            {
-                sqlConnection.Open();
-                SqlDataAdapter sqlDa = new SqlDataAdapter("BookViewAll", sqlConnection);
-                sqlDa.SelectCommand.CommandType = CommandType.StoredProcedure;
-                sqlDa.Fill(dtbl);
-            }
-            return View(dtbl);
+            return View();
         }
 
         // GET: Book/AddOrEdit/
@@ -53,20 +41,10 @@ namespace MVCCRUDwithoutEF.Controllers
         {
             if (ModelState.IsValid)
             {
-                using (SqlConnection sqlConnection = new SqlConnection(_configuration.GetConnectionString("DevConnection")))
-                {
-                    sqlConnection.Open();
-                    SqlCommand sqlCmd = new SqlCommand("BookAddOrEdit", sqlConnection);
-                    sqlCmd.CommandType = CommandType.StoredProcedure;
-                    sqlCmd.Parameters.AddWithValue("BookID", bookViewModel.BookID);
-                    sqlCmd.Parameters.AddWithValue("Title", bookViewModel.Title);
-                    sqlCmd.Parameters.AddWithValue("Author", bookViewModel.Author);
-                    sqlCmd.Parameters.AddWithValue("Price", bookViewModel.Price);
-                    sqlCmd.ExecuteNonQuery();
-                }
+                
                 return RedirectToAction(nameof(Index));
             }
-            return View(bookViewModel);
+            return View();
         }
 
         // GET: Book/Delete/5
