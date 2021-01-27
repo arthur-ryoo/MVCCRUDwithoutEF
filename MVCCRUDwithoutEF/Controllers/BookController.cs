@@ -41,6 +41,8 @@ namespace MVCCRUDwithoutEF.Controllers
         public IActionResult AddOrEdit(int? id)
         {
             BookViewModel bookViewModel = new BookViewModel();
+            if (id > 0)
+                bookViewModel = FetchBookByID(id);
             return View(bookViewModel);
         }
 
@@ -85,5 +87,27 @@ namespace MVCCRUDwithoutEF.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [NonAction]
+        public BookViewModel FetchBookByID(int? id)
+        {
+            BookViewModel bookViewModel = new BookViewModel();
+            using (SqlConnection sqlConnection = new SqlConnection(_configuration.GetConnectionString("DevConnection")))
+            {
+                DataTable dtbl = new DataTable();
+                sqlConnection.Open();
+                SqlDataAdapter sqlDa = new SqlDataAdapter("BookViewByID", sqlConnection);
+                sqlDa.SelectCommand.Parameters.AddWithValue("BookID", id);
+                sqlDa.SelectCommand.CommandType = CommandType.StoredProcedure;
+                sqlDa.Fill(dtbl);
+                if(dtbl.Rows.Count == 1)
+                {
+                    bookViewModel.BookID = Convert.ToInt32(dtbl.Rows[0]["BookID"].ToString());
+                    bookViewModel.Title = dtbl.Rows[0]["Title"].ToString();
+                    bookViewModel.Author = dtbl.Rows[0]["Author"].ToString();
+                    bookViewModel.Price = Convert.ToInt32(dtbl.Rows[0]["Price"].ToString());
+                }
+                return bookViewModel;
+            }
+        }
     }
 }
